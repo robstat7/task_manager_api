@@ -54,7 +54,7 @@ def get_task(id):
 
 @bp.route('/<int:id>/update', methods=['PUT'])
 def update(id):
-    task = get_task(id)
+    get_task(id)
 
     title = request.json.get('title')
 
@@ -82,6 +82,22 @@ def update(id):
                  }
 
         return (jsonify(result), 200)
+
+
+@bp.route('/<int:id>/delete', methods=['DELETE'])
+def delete(id):
+    task = get_task(id)
+    db = get_db()
+    db.execute('DELETE FROM task WHERE id = ?', (id,))
+    db.commit()
+
+
+    result = {"message": "Task deleted successfully",
+              "task_id": id,
+              "task_title": task["title"]
+              }
+
+    return (jsonify(result), 200)
 
 
 
