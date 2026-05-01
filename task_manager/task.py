@@ -22,3 +22,16 @@ def create():
         )
         db.commit()
         return jsonify({"message": "Task added successfully"}), 201
+
+
+@bp.route('/')
+def index():
+    db = get_db()
+    tasks = db.execute(
+        'SELECT id, title'
+        ' FROM task'
+        ' ORDER BY id DESC'
+    ).fetchall()
+
+    tasks_list = [{'task_id': task['id'], 'task_title': task['title']} for task in tasks]
+    return jsonify(tasks_list), 200
