@@ -29,7 +29,7 @@ def create():
                 (new_task_cursor.lastrowid, )
                 ).fetchone()
 
-        return jsonify({"message": "Task added successfully", "task_id": new_task_cursor.lastrowid, "task_title": new_task["title"]}), 201
+        return (jsonify({"message": "Task added successfully", "task_id": new_task_cursor.lastrowid, "task_title": new_task["title"]}), 201)
 
 
 @bp.route('/')
@@ -42,4 +42,4 @@ def index():
     ).fetchall()
 
     tasks_list = [{'task_id': task['id'], 'task_title': task['title']} for task in tasks]
-    return jsonify(tasks_list), 200
+    return (jsonify(tasks_list), 200)
