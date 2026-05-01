@@ -15,13 +15,21 @@ def create():
         return jsonify({"error": "Title is required"}), 400 
     else:
         db = get_db()
-        db.execute(
+        new_task_cursor = db.execute(
             'INSERT INTO task (title)'
             ' VALUES (?)',
             (title,)
         )
         db.commit()
-        return jsonify({"message": "Task added successfully"}), 201
+
+        new_task = db.execute(
+                'SELECT title'
+                ' FROM task'
+                ' WHERE id = ?',
+                (new_task_cursor.lastrowid, )
+                ).fetchone()
+
+        return jsonify({"message": "Task added successfully", "task_id": new_task_cursor.lastrowid, "task_title": new_task["title"]}), 201
 
 
 @bp.route('/')
