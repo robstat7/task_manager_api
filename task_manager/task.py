@@ -1,6 +1,7 @@
 from flask import (
     Blueprint, request, jsonify
 )
+from werkzeug.exceptions import abort
 
 from task_manager.db import get_db
 
@@ -12,7 +13,7 @@ def create():
     title = request.json.get('title')
 
     if not title:
-        return jsonify({"error": "Title is required"}), 400 
+        return (jsonify({"error": "Title is required"}), 400)
     else:
         db = get_db()
         new_task_cursor = db.execute(
@@ -35,6 +36,53 @@ def create():
                  }
 
         return (jsonify(result), 201)
+
+
+def get_task(id):
+    task = get_db().execute(
+        'SELECT id, title'
+        ' FROM task'
+        ' WHERE id = ?',
+        (id,)
+    ).fetchone()
+
+    if task is None:
+        abort(404, f"Task id {id} doesn't exist.")
+
+    return task 
+
+
+@bp.route('/<int:id>/update', methods=['PUT'])
+def update(id):
+    task = get_task(id)
+
+    title = request.json.get('title')
+
+    if not title:
+        return (jsonify({"error": "Title is required"}), 400)
+    else:
+        db = get_db()
+        db.execute(
+            'UPDATE task SET title = ?'
+            ' WHERE id = ?',
+            (title, id)
+        )
+        db.commit()
+
+        task = db.execute(
+                'SELECT title'
+                ' FROM task'
+                ' WHERE id = ?',
+                (id, )
+                ).fetchone()
+
+        result = {"message": "Task updated successfully",
+                  "task_id": id,
+                  "task_title": task["title"]
+                 }
+
+        return (jsonify(result), 200)
+
 
 
 @bp.route('/')
