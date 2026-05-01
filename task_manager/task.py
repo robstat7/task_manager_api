@@ -29,7 +29,12 @@ def create():
                 (new_task_cursor.lastrowid, )
                 ).fetchone()
 
-        return (jsonify({"message": "Task added successfully", "task_id": new_task_cursor.lastrowid, "task_title": new_task["title"]}), 201)
+        result = {"message": "Task added successfully",
+                  "task_id": new_task_cursor.lastrowid,
+                  "task_title": new_task["title"]
+                 }
+
+        return (jsonify(result), 201)
 
 
 @bp.route('/')
