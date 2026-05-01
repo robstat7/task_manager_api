@@ -46,5 +46,7 @@ def index():
         ' ORDER BY id DESC'
     ).fetchall()
 
-    tasks_list = [{'task_id': task['id'], 'task_title': task['title']} for task in tasks]
+    tasks_list = [{'task_id': task['id'], 'task_title': task['title']}
+                  for task in tasks]
+
     return (jsonify(tasks_list), 200)
