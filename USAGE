@@ -1,0 +1,176 @@
+1. First install dbmate (https://github.com/amacneil/dbmate) on your system.
+
+2.
+On terminal tab 1 from project root:
+$ source .venv/bin/activate
+$ flask --app task_manager init-db  # first time only
+$ dbmate up     # run migrations
+$ flask --app task_manager run --debug
+
+On terminal tab 2:
+$ http POST 127.0.0.1:5000/api/tasks title="Go to cinema with Anurag at 5 PM"
+HTTP/1.1 201 CREATED
+Connection: close
+Content-Length: 139
+Content-Type: application/json
+Date: Sat, 02 May 2026 06:22:38 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task added successfully",
+    "task_id": 14,
+    "task_status": "pending",
+    "task_title": "Go to cinema with Anurag at 5 PM"
+}
+
+
+$ http GET 127.0.0.1:5000/api/tasks
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 476
+Content-Type: application/json
+Date: Sat, 02 May 2026 06:22:55 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+[
+    {
+        "task_id": 14,
+        "task_status": "pending",
+        "task_title": "Go to cinema with Anurag at 5 PM"
+    },
+    {
+        "task_id": 13,
+        "task_status": "completed",
+        "task_title": "Buy phone"
+    },
+    {
+        "task_id": 12,
+        "task_status": "pending",
+        "task_title": "Buy computer"
+    },
+    {
+        "task_id": 10,
+        "task_status": "pending",
+        "task_title": "Buy umbrella"
+    },
+    {
+        "task_id": 8,
+        "task_status": "pending",
+        "task_title": "Go to satsang"
+    }
+]
+
+
+$ http PATCH 127.0.0.1:5000/api/tasks/14 title="Go to cinema with Didi at 5 PM"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 146
+Content-Type: application/json
+Date: Sat, 02 May 2026 06:23:29 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task title updated successfully",
+    "task_id": 14,
+    "task_status": "pending",
+    "task_title": "Go to cinema with Didi at 5 PM"
+}
+
+
+$ http DELETE 127.0.0.1:5000/api/tasks/12
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 122
+Content-Type: application/json
+Date: Sat, 02 May 2026 06:24:05 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task deleted successfully",
+    "task_id": 12,
+    "task_status": "pending",
+    "task_title": "Buy computer"
+}
+
+
+$ http GET 127.0.0.1:5000/api/tasks
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 384
+Content-Type: application/json
+Date: Sat, 02 May 2026 06:24:11 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+[
+    {
+        "task_id": 14,
+        "task_status": "pending",
+        "task_title": "Go to cinema with Didi at 5 PM"
+    },
+    {
+        "task_id": 13,
+        "task_status": "completed",
+        "task_title": "Buy phone"
+    },
+    {
+        "task_id": 10,
+        "task_status": "pending",
+        "task_title": "Buy umbrella"
+    },
+    {
+        "task_id": 8,
+        "task_status": "pending",
+        "task_title": "Go to satsang"
+    }
+]
+
+
+$ http PATCH 127.0.0.1:5000/api/tasks/14/status status=completed
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 149
+Content-Type: application/json
+Date: Sat, 02 May 2026 06:24:45 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task status updated successfully",
+    "task_id": 14,
+    "task_status": "completed",
+    "task_title": "Go to cinema with Didi at 5 PM"
+}
+
+
+$ http GET 127.0.0.1:5000/api/tasks
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 386
+Content-Type: application/json
+Date: Sat, 02 May 2026 06:25:02 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+[
+    {
+        "task_id": 14,
+        "task_status": "completed",
+        "task_title": "Go to cinema with Didi at 5 PM"
+    },
+    {
+        "task_id": 13,
+        "task_status": "completed",
+        "task_title": "Buy phone"
+    },
+    {
+        "task_id": 10,
+        "task_status": "pending",
+        "task_title": "Buy umbrella"
+    },
+    {
+        "task_id": 8,
+        "task_status": "pending",
+        "task_title": "Go to satsang"
+    }
+]
+
+
+
