@@ -13,12 +13,16 @@ def manage_tasks():
     if request.method == 'GET':
         db = get_db()
         tasks = db.execute(
-            'SELECT id, title'
+            'SELECT id, title, status'
             ' FROM task'
             ' ORDER BY id DESC'
         ).fetchall()
 
-        tasks_list = [{'task_id': task['id'], 'task_title': task['title']}
+        tasks_list = [
+                      {'task_id': task['id'],
+                       'task_title': task['title'],
+                       'task_status': task['status']
+                       }
                       for task in tasks]
 
         return (jsonify(tasks_list), 200)
@@ -39,7 +43,8 @@ def manage_tasks():
 
             result = {"message": "Task added successfully",
                       "task_id": new_task_cursor.lastrowid,
-                      "task_title": title
+                      "task_title": title,
+                      "task_status": "pending"
                      }
 
             return (jsonify(result), 201)
