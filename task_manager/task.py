@@ -60,7 +60,7 @@ def get_task(id):
 
 
 @bp.route('/api/tasks/<int:id>', methods=['PUT', 'DELETE'])
-def update(id):
+def update_or_delete_tasks(id):
     task = get_task(id)
 
     if request.method == 'PUT':
