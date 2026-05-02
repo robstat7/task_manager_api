@@ -52,7 +52,7 @@ def manage_tasks():
 
 def get_task(id):
     task = get_db().execute(
-        'SELECT id, title'
+        'SELECT id, title, status'
         ' FROM task'
         ' WHERE id = ?',
         (id,)
@@ -97,7 +97,8 @@ def update_or_delete_tasks(id):
 
         result = {"message": "Task deleted successfully",
                   "task_id": id,
-                  "task_title": task["title"]
+                  "task_title": task["title"],
+                  "task_status": task["status"]
                   }
 
         return (jsonify(result), 200)
