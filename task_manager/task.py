@@ -8,6 +8,9 @@ from task_manager.db import get_db
 bp = Blueprint('task', __name__)
 
 
+STATUS = ['pending', 'completed']
+
+
 @bp.route('/api/tasks', methods=['GET', 'POST'])
 def manage_tasks():
     if request.method == 'GET':
@@ -101,5 +104,33 @@ def update_or_delete_tasks(id):
                   "task_title": task["title"],
                   "task_status": task["status"]
                   }
+
+        return (jsonify(result), 200)
+
+
+@bp.route('/api/tasks/<int:id>/status', methods=['PATCH'])
+def update_task_status(id):
+    task = get_task(id)
+
+    status = request.json.get('status')
+
+    if not status:
+        return (jsonify({"error": "Status is required"}), 400)
+    elif status not in STATUS:
+        return (jsonify({"error": "Invalid status value"}), 422)
+    else:
+        db = get_db()
+        db.execute(
+            'UPDATE task SET status = ?'
+            ' WHERE id = ?',
+            (status, id)
+            )
+        db.commit()
+
+        result = {"message": "Task status updated successfully",
+                  "task_id": id,
+                  "task_title": task["title"],
+                  "task_status": status
+                 }
 
         return (jsonify(result), 200)
