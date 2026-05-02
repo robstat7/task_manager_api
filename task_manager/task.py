@@ -64,11 +64,11 @@ def get_task(id):
     return task 
 
 
-@bp.route('/api/tasks/<int:id>', methods=['PUT', 'DELETE'])
+@bp.route('/api/tasks/<int:id>', methods=['PATCH', 'DELETE'])
 def update_or_delete_tasks(id):
     task = get_task(id)
 
-    if request.method == 'PUT':
+    if request.method == 'PATCH':
         title = request.json.get('title')
 
         if not title:
@@ -82,9 +82,10 @@ def update_or_delete_tasks(id):
             )
             db.commit()
 
-            result = {"message": "Task updated successfully",
+            result = {"message": "Task title updated successfully",
                       "task_id": id,
-                      "task_title": title
+                      "task_title": title,
+                      "task_status": task["status"]
                      }
 
             return (jsonify(result), 200)
