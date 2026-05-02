@@ -1,7 +1,7 @@
 import functools
 
 from flask import (
-    Blueprint, request, jsonify
+    Blueprint, request, jsonify, session
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -44,3 +44,38 @@ def register():
             return (jsonify(result), status_code)
 
     return (jsonify({"error": error}), status_code)
+
+
+
+@bp.route('/login', methods=['POST'])
+def login():
+    username = request.json.get('username')
+    password = request.json.get('password')
+
+    db = get_db()
+
+    error = None
+    status_code = 200
+
+    if not username or not password:
+        error = 'Both username and password are not provided.'
+        status_code = 400
+
+    else:
+        user = db.execute(
+            'SELECT * FROM user WHERE username = ?', (username,)
+        ).fetchone()
+
+        if user is None:
+            error = 'Incorrect username.'
+            status_code = 401
+        elif not check_password_hash(user['password'], password):
+            error = 'Incorrect password.'
+            status_code = 401
+
+        if error is None:
+            session.clear()
+            session['user_id'] = user['id']
+            return ({"message": "login success"}, status_code)
+
+    return ({"error": error}, status_code)
