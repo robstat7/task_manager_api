@@ -1,9 +1,11 @@
 import functools
 
 from flask import (
-    Blueprint, request, jsonify, session
+    Blueprint, request, jsonify
 )
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from flask_jwt_extended import create_access_token
 
 from task_manager.db import get_db
 
@@ -74,8 +76,12 @@ def login():
             status_code = 401
 
         if error is None:
-            session.clear()
-            session['user_id'] = user['id']
-            return ({"message": "login success"}, status_code)
+            access_token = create_access_token(identity=user["username"])
+            result = {
+                      "message": "login success",
+                      "access_token": access_token,
+                      "username": username
+                     }
+            return (jsonify(result), status_code)
 
     return ({"error": error}, status_code)

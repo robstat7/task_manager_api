@@ -2,6 +2,8 @@ import os
 
 from flask import Flask
 
+from flask_jwt_extended import JWTManager
+
 
 def create_app(test_config=None):
     # create and configure the app
@@ -29,5 +31,9 @@ def create_app(test_config=None):
 
     from . import auth
     app.register_blueprint(auth.bp)
+
+    # setup the Flask-JWT-Extended extension
+    app.config["JWT_SECRET_KEY"] = "secret-lksfi35it3ioakaer87743egksl&*#"
+    jwt = JWTManager(app)
 
     return app
