@@ -23,16 +23,9 @@ def create():
         )
         db.commit()
 
-        new_task = db.execute(
-                'SELECT title'
-                ' FROM task'
-                ' WHERE id = ?',
-                (new_task_cursor.lastrowid, )
-                ).fetchone()
-
         result = {"message": "Task added successfully",
                   "task_id": new_task_cursor.lastrowid,
-                  "task_title": new_task["title"]
+                  "task_title": title
                  }
 
         return (jsonify(result), 201)
@@ -69,16 +62,9 @@ def update(id):
         )
         db.commit()
 
-        task = db.execute(
-                'SELECT title'
-                ' FROM task'
-                ' WHERE id = ?',
-                (id, )
-                ).fetchone()
-
         result = {"message": "Task updated successfully",
                   "task_id": id,
-                  "task_title": task["title"]
+                  "task_title": title
                  }
 
         return (jsonify(result), 200)
