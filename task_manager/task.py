@@ -8,7 +8,7 @@ from task_manager.db import get_db
 bp = Blueprint('task', __name__)
 
 
-@bp.route('/create', methods=['POST'])
+@bp.route('/api/tasks', methods=['POST'])
 def create():
     title = request.json.get('title')
 
@@ -52,7 +52,7 @@ def get_task(id):
     return task 
 
 
-@bp.route('/<int:id>/update', methods=['PUT'])
+@bp.route('/api/tasks/<int:id>', methods=['PUT'])
 def update(id):
     get_task(id)
 
@@ -84,7 +84,7 @@ def update(id):
         return (jsonify(result), 200)
 
 
-@bp.route('/<int:id>/delete', methods=['DELETE'])
+@bp.route('/api/tasks/<int:id>', methods=['DELETE'])
 def delete(id):
     task = get_task(id)
     db = get_db()
@@ -101,7 +101,7 @@ def delete(id):
 
 
 
-@bp.route('/')
+@bp.route('/api/tasks')
 def index():
     db = get_db()
     tasks = db.execute(
