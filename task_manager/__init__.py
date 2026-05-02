@@ -26,6 +26,5 @@ def create_app(test_config=None):
 
     from . import task
     app.register_blueprint(task.bp)
-    app.add_url_rule('/', endpoint='index')
 
     return app
