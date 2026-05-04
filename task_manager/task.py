@@ -3,6 +3,8 @@ from flask import (
 )
 from werkzeug.exceptions import abort
 
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 from task_manager.db import get_db
 
 bp = Blueprint('task', __name__)
@@ -12,13 +14,17 @@ STATUS = ['pending', 'completed']
 
 
 @bp.route('/api/tasks', methods=['GET', 'POST'])
+@jwt_required()
 def manage_tasks():
+    current_user_id = int(get_jwt_identity())
+
     if request.method == 'GET':
         db = get_db()
         tasks = db.execute(
             'SELECT id, title, status'
-            ' FROM task'
-            ' ORDER BY id DESC'
+            ' FROM task WHERE user_id = ?'
+            ' ORDER BY id DESC',
+            (current_user_id,)
         ).fetchall()
 
         tasks_list = [
@@ -38,9 +44,9 @@ def manage_tasks():
         else:
             db = get_db()
             new_task_cursor = db.execute(
-                'INSERT INTO task (title)'
-                ' VALUES (?)',
-                (title,)
+                'INSERT INTO task (title, user_id)'
+                ' VALUES (?, ?)',
+                (title, current_user_id)
             )
             db.commit()
 

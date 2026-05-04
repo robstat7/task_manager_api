@@ -5,7 +5,9 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import (
+        create_access_token
+)
 
 from task_manager.db import get_db
 
@@ -76,7 +78,7 @@ def login():
             status_code = 401
 
         if error is None:
-            access_token = create_access_token(identity=user["username"])
+            access_token = create_access_token(identity=str(user["id"]))
             result = {
                       "message": "login success",
                       "access_token": access_token,
