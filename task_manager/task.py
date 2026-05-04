@@ -61,7 +61,7 @@ def manage_tasks():
 
 def get_task(id):
     task = get_db().execute(
-        'SELECT id, title, status'
+        'SELECT id, title, status, user_id'
         ' FROM task'
         ' WHERE id = ?',
         (id,)
@@ -74,8 +74,14 @@ def get_task(id):
 
 
 @bp.route('/api/tasks/<int:id>', methods=['PATCH', 'DELETE'])
+@jwt_required()
 def update_or_delete_tasks(id):
+    current_user_id = int(get_jwt_identity())
+
     task = get_task(id)
+
+    if task["user_id"] != current_user_id:
+        return (jsonify({"error": "Not your task"}), 403)
 
     if request.method == 'PATCH':
         title = request.json.get('title')
@@ -115,8 +121,15 @@ def update_or_delete_tasks(id):
 
 
 @bp.route('/api/tasks/<int:id>/status', methods=['PATCH'])
+@jwt_required()
 def update_task_status(id):
+    current_user_id = int(get_jwt_identity())
+
     task = get_task(id)
+
+    if task["user_id"] != current_user_id:
+        return (jsonify({"error": "Not your task"}), 403)
+
 
     status = request.json.get('status')
 
