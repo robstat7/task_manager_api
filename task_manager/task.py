@@ -78,7 +78,7 @@ def get_task(id):
 
 @bp.route('/api/tasks/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
 @jwt_required()
-def update_or_delete_tasks(id):
+def get_update_or_delete_tasks(id):
     current_user_id = int(get_jwt_identity())
 
     task = get_task(id)
