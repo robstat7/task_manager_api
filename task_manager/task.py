@@ -76,7 +76,7 @@ def get_task(id):
     return task 
 
 
-@bp.route('/api/tasks/<int:id>', methods=['PATCH', 'DELETE'])
+@bp.route('/api/tasks/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
 @jwt_required()
 def update_or_delete_tasks(id):
     current_user_id = int(get_jwt_identity())
@@ -86,7 +86,15 @@ def update_or_delete_tasks(id):
     if task["user_id"] != current_user_id:
         return (jsonify({"error": "Not your task"}), 403)
 
-    if request.method == 'PATCH':
+    if request.method == 'GET':
+        result = {"task_id": id,
+                  "task_title": task["title"],
+                  "task_description": task["description"],
+                  "task_status": task["status"]
+                 }
+        return (jsonify(result), 200)
+
+    elif request.method == 'PATCH':
         title = request.json.get('title')
         description = request.json.get('description')
 
