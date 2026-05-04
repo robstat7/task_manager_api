@@ -8,11 +8,12 @@ CREATE TABLE IF NOT EXISTS "task" (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
   status TEXT DEFAULT 'pending',
-  user_id INTEGER NOT NULL,
+  user_id INTEGER NOT NULL, description TEXT,
   FOREIGN KEY (user_id) REFERENCES user (id)
 );
 -- Dbmate schema migrations
 INSERT INTO "schema_migrations" (version) VALUES
   ('20260502052115'),
   ('20260502081612'),
-  ('20260502135947');
+  ('20260502135947'),
+  ('20260504065655');

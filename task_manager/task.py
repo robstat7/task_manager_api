@@ -21,7 +21,7 @@ def manage_tasks():
     if request.method == 'GET':
         db = get_db()
         tasks = db.execute(
-            'SELECT id, title, status'
+            'SELECT id, title, description, status'
             ' FROM task WHERE user_id = ?'
             ' ORDER BY id DESC',
             (current_user_id,)
@@ -30,6 +30,7 @@ def manage_tasks():
         tasks_list = [
                       {'task_id': task['id'],
                        'task_title': task['title'],
+                       'task_description': task['description'],
                        'task_status': task['status']
                        }
                       for task in tasks]
@@ -38,21 +39,23 @@ def manage_tasks():
 
     else:
         title = request.json.get('title')
+        description = request.json.get('description')
 
         if not title:
             return (jsonify({"error": "Title is required"}), 400)
         else:
             db = get_db()
             new_task_cursor = db.execute(
-                'INSERT INTO task (title, user_id)'
-                ' VALUES (?, ?)',
-                (title, current_user_id)
+                'INSERT INTO task (title, description, user_id)'
+                ' VALUES (?, ?, ?)',
+                (title, description, current_user_id)
             )
             db.commit()
 
             result = {"message": "Task added successfully",
                       "task_id": new_task_cursor.lastrowid,
                       "task_title": title,
+                      "task_description": description,
                       "task_status": "pending"
                      }
 
@@ -61,7 +64,7 @@ def manage_tasks():
 
 def get_task(id):
     task = get_db().execute(
-        'SELECT id, title, status, user_id'
+        'SELECT id, title, description, status, user_id'
         ' FROM task'
         ' WHERE id = ?',
         (id,)
@@ -85,22 +88,50 @@ def update_or_delete_tasks(id):
 
     if request.method == 'PATCH':
         title = request.json.get('title')
+        description = request.json.get('description')
 
-        if not title:
-            return (jsonify({"error": "Title is required"}), 400)
+        if not title and not description:
+            return (jsonify({"error": "Either task title or description or both are required"}), 400)
         else:
             db = get_db()
-            db.execute(
-                'UPDATE task SET title = ?'
-                ' WHERE id = ?',
-                (title, id)
-            )
-            db.commit()
 
-            result = {"message": "Task title updated successfully",
+            if title and not description:
+                db.execute(
+                    'UPDATE task SET title = ?'
+                    ' WHERE id = ?',
+                    (title, id)
+                )
+                db.commit()
+
+            elif description and not title:
+                db.execute(
+                    'UPDATE task SET description = ?'
+                    ' WHERE id = ?',
+                    (description, id)
+                )
+                db.commit()
+
+            else:
+                db.execute(
+                    'UPDATE task SET title = ?, description = ?'
+                    ' WHERE id = ?',
+                    (title, description, id)
+                )
+                db.commit()
+
+
+            updated_task = db.execute(
+                    'SELECT title, description, status'
+                    ' FROM task'
+                    ' WHERE id = ?',
+                    (id,)
+                ).fetchone()
+
+            result = {"message": "Task updated successfully",
                       "task_id": id,
-                      "task_title": title,
-                      "task_status": task["status"]
+                      "task_title": updated_task["title"],
+                      "task_description": updated_task["description"],
+                      "task_status": updated_task["status"]
                      }
 
             return (jsonify(result), 200)
@@ -114,6 +145,7 @@ def update_or_delete_tasks(id):
         result = {"message": "Task deleted successfully",
                   "task_id": id,
                   "task_title": task["title"],
+                  "task_description": task["description"],
                   "task_status": task["status"]
                   }
 
@@ -149,6 +181,7 @@ def update_task_status(id):
         result = {"message": "Task status updated successfully",
                   "task_id": id,
                   "task_title": task["title"],
+                  "task_description": task["description"],
                   "task_status": status
                  }
 
