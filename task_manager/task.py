@@ -91,7 +91,9 @@ def update_or_delete_tasks(id):
         description = request.json.get('description')
 
         if not title and not description:
-            return (jsonify({"error": "Either task title or description or both are required"}), 400)
+            result = {"error":
+                      "Either task title or description or both are required"}
+            return (jsonify(result), 400)
         else:
             db = get_db()
 
