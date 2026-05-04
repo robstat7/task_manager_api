@@ -95,56 +95,54 @@ def get_update_or_delete_tasks(id):
         return (jsonify(result), 200)
 
     elif request.method == 'PATCH':
-        title = request.json.get('title')
-        description = request.json.get('description')
 
-        if not title and not description:
-            result = {"error":
-                      "Either task title or description or both are required"}
-            return (jsonify(result), 400)
-        else:
-            db = get_db()
+        if 'title' in request.json:
+            if request.json['title'] is None or request.json['title'] == '':
+                result = {"error":
+                          "Title is required"}
+                return (jsonify(result), 400)
 
-            if title and not description:
-                db.execute(
-                    'UPDATE task SET title = ?'
-                    ' WHERE id = ?',
-                    (title, id)
-                )
-                db.commit()
+        db = get_db()
 
-            elif description and not title:
-                db.execute(
-                    'UPDATE task SET description = ?'
-                    ' WHERE id = ?',
-                    (description, id)
-                )
-                db.commit()
+        if 'title' in request.json and 'description' in request.json:
+            db.execute(
+                'UPDATE task SET title = ?, description = ?'
+                ' WHERE id = ?',
+                (request.json['title'], request.json['description'], id)
+            )
+            db.commit()
 
-            else:
-                db.execute(
-                    'UPDATE task SET title = ?, description = ?'
-                    ' WHERE id = ?',
-                    (title, description, id)
-                )
-                db.commit()
+        elif 'description' in request.json:
+            db.execute(
+                'UPDATE task SET description = ?'
+                ' WHERE id = ?',
+                (request.json['description'], id)
+            )
+            db.commit()
 
+        elif 'title' in request.json:
+            db.execute(
+                'UPDATE task SET title = ?'
+                ' WHERE id = ?',
+                (request.json['title'], id)
+            )
+            db.commit()
 
-            updated_task = db.execute(
-                    'SELECT title, description, status'
-                    ' FROM task'
-                    ' WHERE id = ?',
-                    (id,)
-                ).fetchone()
+        updated_task = db.execute(
+                'SELECT title, description, status'
+                ' FROM task'
+                ' WHERE id = ?',
+                (id,)
+            ).fetchone()
 
-            result = {"message": "Task updated successfully",
-                      "task_id": id,
-                      "task_title": updated_task["title"],
-                      "task_description": updated_task["description"],
-                      "task_status": updated_task["status"]
-                     }
+        result = {"message": "Task updated successfully",
+                  "task_id": id,
+                  "task_title": updated_task["title"],
+                  "task_description": updated_task["description"],
+                  "task_status": updated_task["status"]
+                 }
 
-            return (jsonify(result), 200)
+        return (jsonify(result), 200)
 
     else:
         db = get_db()
