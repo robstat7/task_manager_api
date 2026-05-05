@@ -19,13 +19,30 @@ def manage_tasks():
     current_user_id = int(get_jwt_identity())
 
     if request.method == 'GET':
+        tasks = None
         db = get_db()
-        tasks = db.execute(
-            'SELECT id, title, description, status'
-            ' FROM task WHERE user_id = ?'
-            ' ORDER BY id DESC',
-            (current_user_id,)
-        ).fetchall()
+
+        status = request.args.get('status') # query param
+
+        if status is None:
+            tasks = db.execute(
+                'SELECT id, title, description, status'
+                ' FROM task WHERE user_id = ?'
+                ' ORDER BY id DESC',
+                (current_user_id,)
+            ).fetchall()
+
+        elif status not in STATUS:
+            result = {'error': 'Invalid status value.'}
+            return (jsonify(result), 400)
+
+        else:
+            tasks = db.execute(
+                    'SELECT id, title, description, status'
+                    ' FROM task WHERE user_id = ? AND status = ?'
+                    ' ORDER BY id DESC',
+                    (current_user_id, status)
+                    ).fetchall()
 
         tasks_list = [
                       {'task_id': task['id'],
