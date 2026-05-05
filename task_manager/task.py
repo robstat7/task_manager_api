@@ -22,32 +22,51 @@ def manage_tasks():
         tasks = None
         db = get_db()
 
-        status = request.args.get('status') # query param
+        # get query params
+        status = request.args.get('status')
+        category = request.args.get('category')
 
-        if status is None:
+        if status is None and category is None:
             tasks = db.execute(
-                'SELECT id, title, description, status'
+                'SELECT id, title, description, category, status'
                 ' FROM task WHERE user_id = ?'
                 ' ORDER BY id DESC',
                 (current_user_id,)
             ).fetchall()
 
-        elif status not in STATUS:
+        elif status is not None and status not in STATUS:
             result = {'error': 'Invalid status value.'}
             return (jsonify(result), 400)
 
-        else:
+        elif status is not None and category is not None:
             tasks = db.execute(
-                    'SELECT id, title, description, status'
+                    'SELECT id, title, description, category, status'
+                    ' FROM task WHERE user_id = ? AND status = ? AND category = ?'
+                    ' ORDER BY id DESC',
+                    (current_user_id, status, category)
+                    ).fetchall()
+
+        elif status is not None:
+            tasks = db.execute(
+                    'SELECT id, title, description, category, status'
                     ' FROM task WHERE user_id = ? AND status = ?'
                     ' ORDER BY id DESC',
                     (current_user_id, status)
+                    ).fetchall()
+
+        elif category is not None:
+            tasks = db.execute(
+                    'SELECT id, title, description, category, status'
+                    ' FROM task WHERE user_id = ? AND category = ?'
+                    ' ORDER BY id DESC',
+                    (current_user_id, category)
                     ).fetchall()
 
         tasks_list = [
                       {'task_id': task['id'],
                        'task_title': task['title'],
                        'task_description': task['description'],
+                       'task_category': task['category'],
                        'task_status': task['status']
                        }
                       for task in tasks]
@@ -57,15 +76,16 @@ def manage_tasks():
     else:
         title = request.json.get('title')
         description = request.json.get('description')
+        category = request.json.get('category')
 
         if not title:
             return (jsonify({"error": "Title is required"}), 400)
         else:
             db = get_db()
             new_task_cursor = db.execute(
-                'INSERT INTO task (title, description, user_id)'
-                ' VALUES (?, ?, ?)',
-                (title, description, current_user_id)
+                'INSERT INTO task (title, description, category, user_id)'
+                ' VALUES (?, ?, ?, ?)',
+                (title, description, category, current_user_id)
             )
             db.commit()
 
@@ -73,6 +93,7 @@ def manage_tasks():
                       "task_id": new_task_cursor.lastrowid,
                       "task_title": title,
                       "task_description": description,
+                      "task_category": category,
                       "task_status": "pending"
                      }
 
@@ -81,7 +102,7 @@ def manage_tasks():
 
 def get_task(id):
     task = get_db().execute(
-        'SELECT id, title, description, status, user_id'
+        'SELECT id, title, description, category, status, user_id'
         ' FROM task'
         ' WHERE id = ?',
         (id,)
@@ -107,6 +128,7 @@ def get_update_or_delete_tasks(id):
         result = {"task_id": id,
                   "task_title": task["title"],
                   "task_description": task["description"],
+                  "task_category": task["category"],
                   "task_status": task["status"]
                  }
         return (jsonify(result), 200)
@@ -146,7 +168,7 @@ def get_update_or_delete_tasks(id):
             db.commit()
 
         updated_task = db.execute(
-                'SELECT title, description, status'
+                'SELECT title, description, category, status'
                 ' FROM task'
                 ' WHERE id = ?',
                 (id,)
@@ -156,6 +178,7 @@ def get_update_or_delete_tasks(id):
                   "task_id": id,
                   "task_title": updated_task["title"],
                   "task_description": updated_task["description"],
+                  "task_category": updated_task["category"],
                   "task_status": updated_task["status"]
                  }
 
@@ -171,6 +194,7 @@ def get_update_or_delete_tasks(id):
                   "task_id": id,
                   "task_title": task["title"],
                   "task_description": task["description"],
+                  "task_category": task["category"],
                   "task_status": task["status"]
                   }
 
@@ -207,7 +231,43 @@ def update_task_status(id):
                   "task_id": id,
                   "task_title": task["title"],
                   "task_description": task["description"],
+                  "task_category": task["category"],
                   "task_status": status
+                 }
+
+        return (jsonify(result), 200)
+
+
+@bp.route('/api/tasks/<int:id>/category', methods=['PATCH'])
+@jwt_required()
+def update_task_category(id):
+    current_user_id = int(get_jwt_identity())
+
+    task = get_task(id)
+
+    if task["user_id"] != current_user_id:
+        return (jsonify({"error": "Not your task"}), 403)
+
+
+    category = request.json.get('category')
+
+    if category is not None and not category:
+        return (jsonify({"error": "Category is required"}), 400)
+    else:
+        db = get_db()
+        db.execute(
+            'UPDATE task SET category = ?'
+            ' WHERE id = ?',
+            (category, id)
+            )
+        db.commit()
+
+        result = {"message": "Task category updated successfully",
+                  "task_id": id,
+                  "task_title": task["title"],
+                  "task_description": task["description"],
+                  "task_category": category,
+                  "task_status": task['status']
                  }
 
         return (jsonify(result), 200)
