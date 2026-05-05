@@ -40,11 +40,11 @@ def manage_tasks():
 
         elif status is not None and category is not None:
             tasks = db.execute(
-                    'SELECT id, title, description, category, status'
-                    ' FROM task WHERE user_id = ? AND status = ? AND category = ?'
-                    ' ORDER BY id DESC',
-                    (current_user_id, status, category)
-                    ).fetchall()
+                'SELECT id, title, description, category, status'
+                ' FROM task WHERE user_id = ? AND status = ? AND category = ?'
+                ' ORDER BY id DESC',
+                (current_user_id, status, category)
+                ).fetchall()
 
         elif status is not None:
             tasks = db.execute(
