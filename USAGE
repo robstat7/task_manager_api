@@ -2,175 +2,487 @@
 
 2.
 On terminal tab 1 from project root:
+$ python3 -m venv .venv
 $ source .venv/bin/activate
+$ pip install -r requirements.txt
 $ flask --app task_manager init-db  # first time only
 $ dbmate up     # run migrations
 $ flask --app task_manager run --debug
 
 On terminal tab 2:
-$ http POST 127.0.0.1:5000/api/tasks title="Go to cinema with Anurag at 5 PM"
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http POST 127.0.0.1:5000/auth/register username=test password=<YOUR-PASSWORD>
 HTTP/1.1 201 CREATED
 Connection: close
-Content-Length: 139
+Content-Length: 86
 Content-Type: application/json
-Date: Sat, 02 May 2026 06:22:38 GMT
+Date: Tue, 05 May 2026 06:43:01 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "user registered successfully",
+    "user_id": 3,
+    "username": "test"
+}
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http POST 127.0.0.1:5000/auth/login username=test password=<YOUR-PASSWORD>
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 402
+Content-Type: application/json
+Date: Tue, 05 May 2026 06:43:20 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "access_token": "<ACCESS TOKEN>",
+    "message": "login success",
+    "username": "test"
+}
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ export JWT="<ACCESS TOKEN>"
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http POST 127.0.0.1:5000/api/tasks title="Submit morning code to Dave" description="Submit only main file" category=work Authorization:"Bearer $JWT"
+HTTP/1.1 201 CREATED
+Connection: close
+Content-Length: 208
+Content-Type: application/json
+Date: Tue, 05 May 2026 06:46:34 GMT
 Server: Werkzeug/3.1.8 Python/3.12.3
 
 {
     "message": "Task added successfully",
-    "task_id": 14,
+    "task_category": "work",
+    "task_description": "Submit only main file",
+    "task_id": 9,
     "task_status": "pending",
-    "task_title": "Go to cinema with Anurag at 5 PM"
+    "task_title": "Submit morning code to Dave"
 }
 
 
-$ http GET 127.0.0.1:5000/api/tasks
-HTTP/1.1 200 OK
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http POST 127.0.0.1:5000/api/tasks title="Ask clarify questions from John" category=work Authorization:"Bearer $JWT"
+HTTP/1.1 201 CREATED
 Connection: close
-Content-Length: 476
+Content-Length: 194
 Content-Type: application/json
-Date: Sat, 02 May 2026 06:22:55 GMT
-Server: Werkzeug/3.1.8 Python/3.12.3
-
-[
-    {
-        "task_id": 14,
-        "task_status": "pending",
-        "task_title": "Go to cinema with Anurag at 5 PM"
-    },
-    {
-        "task_id": 13,
-        "task_status": "completed",
-        "task_title": "Buy phone"
-    },
-    {
-        "task_id": 12,
-        "task_status": "pending",
-        "task_title": "Buy computer"
-    },
-    {
-        "task_id": 10,
-        "task_status": "pending",
-        "task_title": "Buy umbrella"
-    },
-    {
-        "task_id": 8,
-        "task_status": "pending",
-        "task_title": "Go to satsang"
-    }
-]
-
-
-$ http PATCH 127.0.0.1:5000/api/tasks/14 title="Go to cinema with Didi at 5 PM"
-HTTP/1.1 200 OK
-Connection: close
-Content-Length: 146
-Content-Type: application/json
-Date: Sat, 02 May 2026 06:23:29 GMT
+Date: Tue, 05 May 2026 06:56:34 GMT
 Server: Werkzeug/3.1.8 Python/3.12.3
 
 {
-    "message": "Task title updated successfully",
-    "task_id": 14,
+    "message": "Task added successfully",
+    "task_category": "work",
+    "task_description": null,
+    "task_id": 10,
     "task_status": "pending",
-    "task_title": "Go to cinema with Didi at 5 PM"
+    "task_title": "Ask clarify questions from John"
 }
 
 
-$ http DELETE 127.0.0.1:5000/api/tasks/12
-HTTP/1.1 200 OK
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http POST 127.0.0.1:5000/api/tasks title="Join coffee meeting at 5 PM today" description="Hall no. 33" category=work Authorization:"Bearer $JWT"
+HTTP/1.1 201 CREATED
 Connection: close
-Content-Length: 122
+Content-Length: 205
 Content-Type: application/json
-Date: Sat, 02 May 2026 06:24:05 GMT
+Date: Tue, 05 May 2026 06:59:49 GMT
 Server: Werkzeug/3.1.8 Python/3.12.3
 
 {
-    "message": "Task deleted successfully",
+    "message": "Task added successfully",
+    "task_category": "work",
+    "task_description": "Hall no. 33",
+    "task_id": 11,
+    "task_status": "pending",
+    "task_title": "Join coffee meeting at 5 PM today"
+}
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http POST 127.0.0.1:5000/api/tasks title="Buy toy car" description="For Vedik" category=personal Authorization:"Bearer $JWT"
+HTTP/1.1 201 CREATED
+Connection: close
+Content-Length: 185
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:01:20 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task added successfully",
+    "task_category": "personal",
+    "task_description": "For Vedik",
     "task_id": 12,
     "task_status": "pending",
-    "task_title": "Buy computer"
+    "task_title": "Buy toy car"
 }
 
 
-$ http GET 127.0.0.1:5000/api/tasks
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http POST 127.0.0.1:5000/api/tasks title="Go to satsang" category=personal Authorization:"Bearer $JWT"
+HTTP/1.1 201 CREATED
+Connection: close
+Content-Length: 180
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:02:03 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task added successfully",
+    "task_category": "personal",
+    "task_description": null,
+    "task_id": 13,
+    "task_status": "pending",
+    "task_title": "Go to satsang"
+}
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http POST 127.0.0.1:5000/api/tasks title="Help uncle Alex at his office" Authorization:"Bearer $JWT"
+HTTP/1.1 201 CREATED
+Connection: close
+Content-Length: 190
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:02:56 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task added successfully",
+    "task_category": null,
+    "task_description": null,
+    "task_id": 14,
+    "task_status": "pending",
+    "task_title": "Help uncle Alex at his office"
+}
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http GET 127.0.0.1:5000/api/tasks Authorization:"Bearer $JWT"
 HTTP/1.1 200 OK
 Connection: close
-Content-Length: 384
+Content-Length: 1015
 Content-Type: application/json
-Date: Sat, 02 May 2026 06:24:11 GMT
+Date: Tue, 05 May 2026 07:03:39 GMT
 Server: Werkzeug/3.1.8 Python/3.12.3
 
 [
     {
+        "task_category": null,
+        "task_description": null,
         "task_id": 14,
         "task_status": "pending",
-        "task_title": "Go to cinema with Didi at 5 PM"
+        "task_title": "Help uncle Alex at his office"
     },
     {
+        "task_category": "personal",
+        "task_description": null,
         "task_id": 13,
-        "task_status": "completed",
-        "task_title": "Buy phone"
-    },
-    {
-        "task_id": 10,
-        "task_status": "pending",
-        "task_title": "Buy umbrella"
-    },
-    {
-        "task_id": 8,
         "task_status": "pending",
         "task_title": "Go to satsang"
+    },
+    {
+        "task_category": "personal",
+        "task_description": "For Vedik",
+        "task_id": 12,
+        "task_status": "pending",
+        "task_title": "Buy toy car"
+    },
+    {
+        "task_category": "work",
+        "task_description": "Hall no. 33",
+        "task_id": 11,
+        "task_status": "pending",
+        "task_title": "Join coffee meeting at 5 PM today"
+    },
+    {
+        "task_category": "work",
+        "task_description": null,
+        "task_id": 10,
+        "task_status": "pending",
+        "task_title": "Ask clarify questions from John"
+    },
+    {
+        "task_category": "work",
+        "task_description": "Submit only main file",
+        "task_id": 9,
+        "task_status": "pending",
+        "task_title": "Submit morning code to Dave"
     }
 ]
 
 
-$ http PATCH 127.0.0.1:5000/api/tasks/14/status status=completed
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http GET 127.0.0.1:5000/api/tasks/9 Authorization:"Bearer $JWT"
 HTTP/1.1 200 OK
 Connection: close
-Content-Length: 149
+Content-Length: 168
 Content-Type: application/json
-Date: Sat, 02 May 2026 06:24:45 GMT
+Date: Tue, 05 May 2026 07:05:03 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "task_category": "work",
+    "task_description": "Submit only main file",
+    "task_id": 9,
+    "task_status": "pending",
+    "task_title": "Submit morning code to Dave"
+}
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http PATCH 127.0.0.1:5000/api/tasks/9 title="Submit code to Dave" description="Submit main and library files" Authorization:"Bearer $JWT"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 210
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:07:33 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task updated successfully",
+    "task_category": "work",
+    "task_description": "Submit main and library files",
+    "task_id": 9,
+    "task_status": "pending",
+    "task_title": "Submit code to Dave"
+}
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http PATCH 127.0.0.1:5000/api/tasks/9/category category=office Authorization:"Bearer $JWT"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 221
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:08:24 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task category updated successfully",
+    "task_category": "office",
+    "task_description": "Submit main and library files",
+    "task_id": 9,
+    "task_status": "pending",
+    "task_title": "Submit code to Dave"
+}
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http PATCH 127.0.0.1:5000/api/tasks/9/status status=completed Authorization:"Bearer $JWT"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 221
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:09:18 GMT
 Server: Werkzeug/3.1.8 Python/3.12.3
 
 {
     "message": "Task status updated successfully",
-    "task_id": 14,
+    "task_category": "office",
+    "task_description": "Submit main and library files",
+    "task_id": 9,
     "task_status": "completed",
-    "task_title": "Go to cinema with Didi at 5 PM"
+    "task_title": "Submit code to Dave"
 }
 
 
-$ http GET 127.0.0.1:5000/api/tasks
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http GET 127.0.0.1:5000/api/tasks status==pending category==personal Authorization:"Bearer $JWT"
 HTTP/1.1 200 OK
 Connection: close
-Content-Length: 386
+Content-Length: 318
 Content-Type: application/json
-Date: Sat, 02 May 2026 06:25:02 GMT
+Date: Tue, 05 May 2026 07:10:42 GMT
 Server: Werkzeug/3.1.8 Python/3.12.3
 
 [
     {
-        "task_id": 14,
-        "task_status": "completed",
-        "task_title": "Go to cinema with Didi at 5 PM"
-    },
-    {
+        "task_category": "personal",
+        "task_description": null,
         "task_id": 13,
-        "task_status": "completed",
-        "task_title": "Buy phone"
-    },
-    {
-        "task_id": 10,
-        "task_status": "pending",
-        "task_title": "Buy umbrella"
-    },
-    {
-        "task_id": 8,
         "task_status": "pending",
         "task_title": "Go to satsang"
+    },
+    {
+        "task_category": "personal",
+        "task_description": "For Vedik",
+        "task_id": 12,
+        "task_status": "pending",
+        "task_title": "Buy toy car"
     }
 ]
 
 
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http GET 127.0.0.1:5000/api/tasks status==completed Authorization:"Bearer $JWT"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 190
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:11:21 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
 
+[
+    {
+        "task_category": "office",
+        "task_description": "Submit main and library files",
+        "task_id": 9,
+        "task_status": "completed",
+        "task_title": "Submit code to Dave"
+    }
+]
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http PATCH 127.0.0.1:5000/api/tasks/11/status status=completed Authorization:"Bearer $JWT"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 216
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:12:19 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task status updated successfully",
+    "task_category": "work",
+    "task_description": "Hall no. 33",
+    "task_id": 11,
+    "task_status": "completed",
+    "task_title": "Join coffee meeting at 5 PM today"
+}
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http GET 127.0.0.1:5000/api/tasks category==work Authorization:"Bearer $JWT"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 354
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:12:26 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+[
+    {
+        "task_category": "work",
+        "task_description": "Hall no. 33",
+        "task_id": 11,
+        "task_status": "completed",
+        "task_title": "Join coffee meeting at 5 PM today"
+    },
+    {
+        "task_category": "work",
+        "task_description": null,
+        "task_id": 10,
+        "task_status": "pending",
+        "task_title": "Ask clarify questions from John"
+    }
+]
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http GET 127.0.0.1:5000/api/tasks status==completed Authorization:"Bearer $JWT"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 372
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:12:59 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+[
+    {
+        "task_category": "work",
+        "task_description": "Hall no. 33",
+        "task_id": 11,
+        "task_status": "completed",
+        "task_title": "Join coffee meeting at 5 PM today"
+    },
+    {
+        "task_category": "office",
+        "task_description": "Submit main and library files",
+        "task_id": 9,
+        "task_status": "completed",
+        "task_title": "Submit code to Dave"
+    }
+]
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http PATCH 127.0.0.1:5000/api/tasks/9/category category=work Authorization:"Bearer $JWT"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 221
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:13:41 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task category updated successfully",
+    "task_category": "work",
+    "task_description": "Submit main and library files",
+    "task_id": 9,
+    "task_status": "completed",
+    "task_title": "Submit code to Dave"
+}
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http GET 127.0.0.1:5000/api/tasks status==pending category==work Authorization:"Bearer $JWT"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 172
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:14:34 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+[
+    {
+        "task_category": "work",
+        "task_description": null,
+        "task_id": 10,
+        "task_status": "pending",
+        "task_title": "Ask clarify questions from John"
+    }
+]
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http GET 127.0.0.1:5000/api/tasks status==completed category==work Authorization:"Bearer $JWT"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 370
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:14:40 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+[
+    {
+        "task_category": "work",
+        "task_description": "Hall no. 33",
+        "task_id": 11,
+        "task_status": "completed",
+        "task_title": "Join coffee meeting at 5 PM today"
+    },
+    {
+        "task_category": "work",
+        "task_description": "Submit main and library files",
+        "task_id": 9,
+        "task_status": "completed",
+        "task_title": "Submit code to Dave"
+    }
+]
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http PATCH 127.0.0.1:5000/api/tasks/12 description:=null Authorization:"Bearer $JWT"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 180
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:16:35 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task updated successfully",
+    "task_category": "personal",
+    "task_description": null,
+    "task_id": 12,
+    "task_status": "pending",
+    "task_title": "Buy toy car"
+}
+
+
+dileep@dileep-HP-Pavilion-Laptop-15-eg2xxx:~/Documents/task_manager_api$ http PATCH 127.0.0.1:5000/api/tasks/12 title="Buy toy car for Vedik" Authorization:"Bearer $JWT"
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 190
+Content-Type: application/json
+Date: Tue, 05 May 2026 07:16:50 GMT
+Server: Werkzeug/3.1.8 Python/3.12.3
+
+{
+    "message": "Task updated successfully",
+    "task_category": "personal",
+    "task_description": null,
+    "task_id": 12,
+    "task_status": "pending",
+    "task_title": "Buy toy car for Vedik"
+}
