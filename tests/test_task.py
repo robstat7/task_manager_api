@@ -59,10 +59,31 @@ def test_author_required(app, client, auth):
     login_response_dict = json.loads(login_response.get_data(as_text=True))
     token = login_response_dict["access_token"]
      
-    # current user can't modify other user's task 
+    # current user can't access and modify other user's task
+
+    assert client.get(
+        "/api/tasks/1",
+        headers={
+            "Authorization": f"Bearer {token}"
+        }
+    ).status_code == 403
 
     assert client.patch(
         "/api/tasks/1",
+        headers={
+            "Authorization": f"Bearer {token}"
+        }
+    ).status_code == 403
+
+    assert client.patch(
+        "/api/tasks/1/category",
+        headers={
+            "Authorization": f"Bearer {token}"
+        }
+    ).status_code == 403
+
+    assert client.patch(
+        "/api/tasks/1/status",
         headers={
             "Authorization": f"Bearer {token}"
         }
