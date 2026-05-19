@@ -27,29 +27,23 @@ def test_index(client, auth):
     assert get_response_list[0]["task_status"] == "pending"
 
 
-have_patched_task_1 = False
+def test_login_required(client):
+    response = client.post('/api/tasks')
+    assert b"Missing Authorization Header" in response.data
 
-@pytest.mark.parametrize('path', (
-    '/api/tasks',
-    '/api/tasks/1',
-    '/api/tasks/1',
-    '/api/tasks/1/status',
-    '/api/tasks/1/category',
-))
-def test_login_required(client, path):
-    response = None
+    response = client.get('/api/tasks/1')
+    assert b"Missing Authorization Header" in response.data
 
-    if path == '/api/tasks':
-        response = client.post(path)
-    else:
-        global have_patched_task_1
-        if path == '/api/tasks/1' and have_patched_task_1:
-            response = client.delete(path)
-        else:
-            response = client.patch(path)
-            if path == '/api/tasks/1':
-                have_patched_task_1 = True
+    response = client.patch('/api/tasks/1')
+    assert b"Missing Authorization Header" in response.data
 
+    response = client.patch('/api/tasks/1/category')
+    assert b"Missing Authorization Header" in response.data
+
+    response = client.patch('/api/tasks/1/status')
+    assert b"Missing Authorization Header" in response.data
+
+    response = client.delete('/api/tasks/1')
     assert b"Missing Authorization Header" in response.data
 
 
